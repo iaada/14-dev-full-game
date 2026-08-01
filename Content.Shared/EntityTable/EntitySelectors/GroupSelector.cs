@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Shared.EntityTable.Conditions;
 using Content.Shared.Random.Helpers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -16,6 +17,12 @@ public sealed partial class GroupSelector : EntityTableSelector
     [DataField(required: true)]
     public List<EntityTableSelector> Children = new();
 
+    /// <summary>
+    /// A list of conditions checked on each direct child.
+    /// </summary>
+    [DataField]
+    public List<EntityTableCondition> ChildConditions = new();
+
     protected override IEnumerable<EntProtoId> GetSpawnsImplementation(IRobustRandom rand,
         IEntityManager entMan,
         IPrototypeManager proto,
@@ -25,7 +32,8 @@ public sealed partial class GroupSelector : EntityTableSelector
         foreach (var child in Children)
         {
             // Don't include invalid groups
-            if (!child.CheckConditions(entMan, proto, ctx))
+            if (!child.CheckConditions(entMan, proto, ctx) ||
+                !child.CheckWithConditions(ChildConditions, entMan, proto, ctx))
                 continue;
 
             children.Add(child, child.Weight);

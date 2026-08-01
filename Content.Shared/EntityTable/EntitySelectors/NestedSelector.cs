@@ -1,3 +1,4 @@
+using Content.Shared.EntityTable.Conditions;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -15,12 +16,21 @@ public sealed partial class NestedSelector : EntityTableSelector
     [DataField(required: true)]
     public ProtoId<EntityTablePrototype> TableId;
 
+    /// <summary>
+    /// A list of conditions checked against the top selector of the nested table.
+    /// </summary>
+    [DataField]
+    public List<EntityTableCondition> ChildConditions = new();
+
     protected override IEnumerable<EntProtoId> GetSpawnsImplementation(IRobustRandom rand,
         IEntityManager entMan,
         IPrototypeManager proto,
         EntityTableContext ctx)
     {
-        return proto.Index(TableId).Table.GetSpawns(rand, entMan, proto, ctx);
+        var table = proto.Index(TableId).Table;
+        table.CheckWithConditions(ChildConditions, entMan, proto, ctx);
+
+        return table.GetSpawns(rand, entMan, proto, ctx);
     }
 
     protected override IEnumerable<(EntProtoId spawn, double)> ListSpawnsImplementation(IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx)

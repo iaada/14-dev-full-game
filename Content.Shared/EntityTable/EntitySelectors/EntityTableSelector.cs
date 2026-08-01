@@ -66,15 +66,23 @@ public abstract partial class EntityTableSelector
     }
 
     /// <summary>
-    /// Check if the condition for this selector are met.
+    /// Check if this selector's conditions are met.
     /// </summary>
     public bool CheckConditions(IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx)
     {
-        if (Conditions.Count == 0)
+        return CheckWithConditions(Conditions, entMan, proto, ctx);
+    }
+
+    /// <summary>
+    /// Check if this selector meets the supplied conditions.
+    /// </summary>
+    public bool CheckWithConditions(List<EntityTableCondition> conditions, IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx)
+    {
+        if (conditions.Count == 0)
             return true;
 
         var success = false;
-        foreach (var condition in Conditions)
+        foreach (var condition in conditions)
         {
             var res = condition.Evaluate(this, entMan, proto, ctx);
 
