@@ -1,0 +1,47 @@
+- type: entityTable
+  id: TestBudgetTableAll
+  table: !type:AllSelector
+    children: &Children
+    - id: TestEntity100
+      conditions: &BudgetConditionEmpty
+      - !type:BudgetRangeCondition
+
+    - id: TestEntity200
+      conditions: *BudgetConditionEmpty
+
+    - id: TestEntity300
+      conditions: *BudgetConditionEmpty
+
+    - id: TestEntityNoBudget
+      conditions:
+      - !type:BudgetRangeCondition
+        costOverride: 400
+
+    - id: TestEntityNoBudget # Logs an error
+      conditions: *BudgetConditionEmpty
+
+- type: entityTable
+  id: TestBudgetTableGroup
+  table: !type:GroupSelector
+    children: *Children
+
+- type: entity
+  id: TestEntity100
+  components:
+  - type: TableBudgetCost
+    cost: 100
+
+- type: entity
+  id: TestEntity200
+  components:
+  - type: TableBudgetCost
+    cost: 200
+
+- type: entity
+  id: TestEntity300
+  components:
+  - type: TableBudgetCost
+    cost: 300
+
+- type: entity
+  id: TestEntityNoBudget
