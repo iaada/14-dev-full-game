@@ -1,29 +1,28 @@
 - type: entityTable
   id: TestBudgetTableAll
   table: !type:AllSelector
-    childConditions:
-    - !type:BudgetRangeCondition
-
     children: &Children
     - id: TestEntity100
+      conditions: &BudgetConditionEmpty
+      - !type:BudgetRangeCondition
 
     - id: TestEntity200
+      conditions: *BudgetConditionEmpty
 
     - id: TestEntity300
+      conditions: *BudgetConditionEmpty
 
-    - id: TestEntityNoBudget # this errors now because it has a BudgetRangeCondition without an override
+    - id: TestEntityNoBudget
       conditions:
       - !type:BudgetRangeCondition
         costOverride: 400
 
     - id: TestEntityNoBudget # Logs an error
+      conditions: *BudgetConditionEmpty
 
 - type: entityTable
   id: TestBudgetTableGroup
   table: !type:GroupSelector
-    childConditions:
-    - !type:BudgetRangeCondition
-
     children: *Children
 
 - type: entity
