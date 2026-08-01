@@ -1,3 +1,4 @@
+using Content.Shared.EntityTable.Conditions;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
@@ -14,6 +15,12 @@ public sealed partial class AllSelector : EntityTableSelector
     [DataField(required: true)]
     public List<EntityTableSelector> Children;
 
+    /// <summary>
+    /// A list of conditions added to the <see cref="EntityTableSelector.TravelingConditions"/> of children.
+    /// </summary>
+    [DataField]
+    public List<EntityTableCondition> ChildConditions = new();
+
     protected override IEnumerable<EntProtoId> GetSpawnsImplementation(IRobustRandom rand,
         IEntityManager entMan,
         IPrototypeManager proto,
@@ -21,6 +28,9 @@ public sealed partial class AllSelector : EntityTableSelector
     {
         foreach (var child in Children)
         {
+            child.TravelingConditions.AddRange(ChildConditions);
+            child.TravelingConditions.AddRange(TravelingConditions);
+
             foreach (var spawn in child.GetSpawns(rand, entMan, proto, ctx))
             {
                 yield return spawn;

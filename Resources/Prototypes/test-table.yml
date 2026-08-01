@@ -25,6 +25,26 @@
   table: !type:GroupSelector
     children: *Children
 
+- type: entityTable
+  id: TestTravelingConditionTable
+  table: !type:GroupSelector
+    childConditions:
+    - !type:BudgetRangeCondition
+      succeedWithNullCost: true # Makes TestEntityNoBudget not error anymore, but it's valid for selection
+    children:
+    - !type:AllSelector
+      conditions:
+      - !type:BudgetRangeCondition
+        costOverride: 200 # Checked separately from traveling parent condition
+      children:
+      - !type:NestedSelector
+        tableId: TestSimpleTable
+
+- type: entityTable
+  id: TestSimpleTable
+  table: !type:AllSelector
+    children: *Children
+
 - type: entity
   id: TestEntity100
   components:

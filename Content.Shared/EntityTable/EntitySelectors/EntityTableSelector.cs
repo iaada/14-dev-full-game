@@ -35,6 +35,11 @@ public abstract partial class EntityTableSelector
     public List<EntityTableCondition> Conditions = new();
 
     /// <summary>
+    /// A list of conditions obtained from parent selectors.
+    /// </summary>
+    public List<EntityTableCondition> TravelingConditions = new();
+
+    /// <summary>
     /// If true, all the conditions must be successful in order for the selector to process.
     /// Otherwise, only one of them must be.
     /// </summary>
@@ -63,6 +68,9 @@ public abstract partial class EntityTableSelector
                 yield return spawn;
             }
         }
+
+        // Clear out the traveling conditions at the end so they don't carry over from previous selections
+        TravelingConditions.Clear();
     }
 
     /// <summary>
@@ -70,11 +78,12 @@ public abstract partial class EntityTableSelector
     /// </summary>
     public bool CheckConditions(IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx)
     {
-        if (Conditions.Count == 0)
+        if (TravelingConditions.Count == 0
+            && Conditions.Count == 0)
             return true;
 
         var success = false;
-        foreach (var condition in Conditions)
+        foreach (var condition in new List<EntityTableCondition>().Concat(TravelingConditions).Concat(Conditions))
         {
             var res = condition.Evaluate(this, entMan, proto, ctx);
 

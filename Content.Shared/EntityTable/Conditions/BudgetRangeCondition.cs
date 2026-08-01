@@ -23,6 +23,13 @@ public sealed partial class BudgetRangeCondition : EntityTableCondition
     [DataField]
     public int? CostOverride;
 
+    /// <summary>
+    /// If true, this condition passes when no budget is given.
+    /// </summary>
+    /// <remarks> This allows the condition to travel through the table without getting stuck on non-entity selectors. </remarks>
+    [DataField]
+    public bool SucceedWithNullCost;
+
     /// <inheritdoc/>
     protected override bool EvaluateImplementation(EntityTableSelector root,
                                                     IEntityManager entMan,
@@ -43,6 +50,9 @@ public sealed partial class BudgetRangeCondition : EntityTableCondition
             // If there's no override, get it from the entity on the selector
             if (root is not EntSelector entSelector)
             {
+                if (SucceedWithNullCost)
+                    return true;
+
                 var log = Logger.GetSawmill("BudgetRangeCondition");
                 log.Error("CostOverride is required for selectors other than EntSelector.");
                 return false;
@@ -50,6 +60,9 @@ public sealed partial class BudgetRangeCondition : EntityTableCondition
 
             if (!proto.Index(entSelector.Id).TryComp(out TableBudgetCostComponent? costComponent, entMan.ComponentFactory))
             {
+                if (SucceedWithNullCost)
+                    return true;
+
                 var log = Logger.GetSawmill("BudgetRangeCondition");
                 log.Error($"Selected object {entSelector.Id} does not have a TableBudgetCostComponent.");
                 return false;
